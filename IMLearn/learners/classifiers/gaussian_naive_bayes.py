@@ -81,7 +81,7 @@ class GaussianNaiveBayes(BaseEstimator):
         if not self.fitted_:
             raise ValueError("Estimator must first be fitted before calling `likelihood` function")
         const = np.sqrt(2 * np.pi * self.vars_)
-        exp = np.exp(np.apply_along_axis(lambda x: (np.power(x - self.mu_) / (-2 * self.vars_)) / const), 1, X)
+        exp = np.exp(np.apply_along_axis(lambda x: (np.power(x - self.mu_, 2) / (-2 * self.vars_)) / const, 1, X))
         return np.prod(exp, axis=2) * self.pi_
 
 

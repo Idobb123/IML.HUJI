@@ -70,10 +70,9 @@ class LDA(BaseEstimator):
         responses : ndarray of shape (n_samples, )
             Predicted responses of given samples
         """
-        # also possible self.classes_[np.argmax(self.likelihood(X), axis=1)]
-        a = self.cov_inv_ @ self.mu_.T
+        a_X = X @ self.cov_inv_ @ self.mu_.T
         b = np.log(self.pi_) - 0.5 * (self.mu_ @ self.cov_inv_ @ self.mu_.T).diagonal()
-        return np.apply_along_axis(np.argmax, 1, a.T @ X + b)
+        return np.apply_along_axis(np.argmax, 1, a_X + b)
 
     def likelihood(self, X: np.ndarray) -> np.ndarray:
         """
