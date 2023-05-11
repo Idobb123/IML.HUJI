@@ -1,3 +1,4 @@
+import numpy as np
 import pandas as pd
 
 from IMLearn.learners.classifiers import Perceptron, LDA, GaussianNaiveBayes
@@ -38,12 +39,14 @@ def run_perceptron():
     Create a line plot that shows the perceptron algorithm's training loss values (y-axis)
     as a function of the training iterations (x-axis).
     """
-    for n, f in [("Linearly Separable", "linearly_separable.npy"), ("Linearly Inseparable", "linearly_inseparable.npy")]:
+    for n, f in [("Linearly Separable", "linearly_separable.npy"),
+                 ("Linearly Inseparable", "linearly_inseparable.npy")]:
         # Load dataset
         X, y = load_dataset("../datasets/" + f)
 
         # Fit Perceptron and record loss in each fit iteration
         losses = []
+
         def callback_func(model: Perceptron, _, __):
             losses.append(model.loss(X, y))
 
@@ -87,26 +90,45 @@ def compare_gaussian_classifiers():
     """
     Fit both Gaussian Naive Bayes and LDA classifiers on both gaussians1 and gaussians2 datasets
     """
-    # Load dataset
-    raise NotImplementedError()
+    for n, f in [("gaussian1", "gaussian1.npy"), ("gaussian2", "gaussian2.npy")]:
+        # Load dataset
+        X, y = load_dataset("../datasets/" + f)
 
-    # Fit models and predict over training set
-    raise NotImplementedError()
+        # Fit models and predict over training set
+        LDA_model = LDA().fit(X, y)
+        GNB_model = GaussianNaiveBayes().fit(X, y)
+        LDA_pred = LDA_model.predict(X)
+        GNB_pred = GNB_model.predict(X)
 
-    # Plot a figure with two suplots, showing the Gaussian Naive Bayes predictions on the left and LDA predictions
-    # on the right. Plot title should specify dataset used and subplot titles should specify algorithm and accuracy
-    # Create subplots
-    from IMLearn.metrics import accuracy
-    raise NotImplementedError()
+        # Plot a figure with two suplots, showing the Gaussian Naive Bayes predictions on the left and LDA predictions
+        # on the right. Plot title should specify dataset used and subplot titles should specify algorithm and accuracy
+        # Create subplots
 
-    # Add traces for data-points setting symbols and colors
-    raise NotImplementedError()
+        from IMLearn.metrics import accuracy
+        fig = make_subplots(rows=1, cols=2, subplot_titles=(f"Gaussian Naive Bayes predictions with accuracy of "
+                                                            f"{round(accuracy(y, GNB_pred),3)} ",
+                                                            f"LDA predictions with accuracy of "
+                                                            f"{round(accuracy(y, LDA_pred),3)} "))
+        fig.update_layout(title_text="Gaussian Naive Bayes and LDA predictions over" + n + " dataset",
+                          showlegend=False, width=900, height=500, title_font=dict(size=24))
+        # Add traces for data-points setting symbols and colors
+        fig.add_trace(go.Scatter(x=X[:, 0], y=X[:, 1], mode="markers",
+                                 marker=dict(color=GNB_pred, symbol=class_symbols[y])), row=1, col=1)
+        fig.add_trace(go.Scatter(x=X[:, 0], y=X[:, 1], mode="markers",
+                                 marker=dict(color=LDA_pred, symbol=class_symbols[y])), row=1, col=2)
 
-    # Add `X` dots specifying fitted Gaussians' means
-    raise NotImplementedError()
+        # Add `X` dots specifying fitted Gaussians' means
+        fig.add_trace(go.Scatter(x=GNB_model.mu_[:, 0], y=GNB_model.mu_[:, 1], mode="markers",
+                                 marker=dict(color="red", symbol="cross", size=14)), row=1, col=1)
+        fig.add_trace(go.Scatter(x=LDA_model.mu_[:, 0], y=LDA_model.mu_[:, 1], mode="markers",
+                                 marker=dict(color="red", symbol="cross", size=14)), row=1, col=2)
 
-    # Add ellipses depicting the covariances of the fitted Gaussians
-    raise NotImplementedError()
+
+        # Add ellipses depicting the covariances of the fitted Gaussians
+        for i in range(len(LDA_model.classes_)):
+            fig.add_trace(get_ellipse(GNB_model.mu_[i], np.diag(GNB_model.vars_[i])), row=1, col=1)
+            fig.add_trace(get_ellipse(GNB_model.mu_[i], LDA_model.cov_), row=1, col=2)
+        fig.write_image(f"Q3_fig_over {n}.png")
 
 
 if __name__ == '__main__':
