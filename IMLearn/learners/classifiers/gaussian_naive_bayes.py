@@ -42,6 +42,7 @@ class GaussianNaiveBayes(BaseEstimator):
         self.classes_, self.pi_ = np.unique(y, return_counts=True)
         self.pi_ = self.pi_ / len(y)
         self.mu_ = np.ndarray((self.classes_.shape[0], X.shape[1]))
+        self.vars_ = np.ndarray((self.classes_.shape[0], X.shape[1]))
         for i, c in enumerate(self.classes_):
             self.mu_[i] = X[np.argwhere((y == c)).flatten(), :].mean(axis=0)
             self.vars_[i] = np.var(X[np.argwhere((y == c)).flatten(), :], axis=0, ddof=1)
