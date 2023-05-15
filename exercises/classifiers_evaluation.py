@@ -109,8 +109,8 @@ def compare_gaussian_classifiers():
                                                             f"{round(accuracy(y, GNB_pred),3)} ",
                                                             f"LDA predictions with accuracy of "
                                                             f"{round(accuracy(y, LDA_pred),3)} "))
-        fig.update_layout(title_text="Gaussian Naive Bayes and LDA predictions over" + n + " dataset",
-                          showlegend=False, width=900, height=500, title_font=dict(size=24))
+        fig.update_layout(title_text="Gaussian Naive Bayes and LDA predictions over " + n + " dataset",
+                          showlegend=False, width=1000, height=500, title_font=dict(size=24))
         # Add traces for data-points setting symbols and colors
         fig.add_trace(go.Scatter(x=X[:, 0], y=X[:, 1], mode="markers",
                                  marker=dict(color=GNB_pred, symbol=class_symbols[y])), row=1, col=1)
@@ -119,9 +119,9 @@ def compare_gaussian_classifiers():
 
         # Add `X` dots specifying fitted Gaussians' means
         fig.add_trace(go.Scatter(x=GNB_model.mu_[:, 0], y=GNB_model.mu_[:, 1], mode="markers",
-                                 marker=dict(color="red", symbol="cross", size=14)), row=1, col=1)
+                                 marker=dict(color="black", symbol="x", size=14)), row=1, col=1)
         fig.add_trace(go.Scatter(x=LDA_model.mu_[:, 0], y=LDA_model.mu_[:, 1], mode="markers",
-                                 marker=dict(color="red", symbol="cross", size=14)), row=1, col=2)
+                                 marker=dict(color="black", symbol="x", size=14)), row=1, col=2)
 
 
         # Add ellipses depicting the covariances of the fitted Gaussians
