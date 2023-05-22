@@ -124,7 +124,7 @@ def compare_gaussian_classifiers():
                                  marker=dict(color="black", symbol="x", size=14)), row=1, col=2)
 
 
-        # Add ellipses depicting the covariances of the fitted Gaussians
+        # Add ellipses depicting the covariances of the fitted Gaussians g
         for i in range(len(LDA_model.classes_)):
             fig.add_trace(get_ellipse(GNB_model.mu_[i], np.diag(GNB_model.vars_[i])), row=1, col=1)
             fig.add_trace(get_ellipse(GNB_model.mu_[i], LDA_model.cov_), row=1, col=2)
