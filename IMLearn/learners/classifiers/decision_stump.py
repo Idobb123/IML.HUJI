@@ -4,6 +4,9 @@ from ...base import BaseEstimator
 import numpy as np
 from itertools import product
 
+MSE = 1
+THR = 0
+
 
 class DecisionStump(BaseEstimator):
     """
@@ -39,7 +42,18 @@ class DecisionStump(BaseEstimator):
         y : ndarray of shape (n_samples, )
             Responses of input data to fit to
         """
-        raise NotImplementedError()
+        thr_list_plus = np.ndarray((X.shape[1], 2))
+        thr_list_minus = np.ndarray((X.shape[1], 2))
+        for j in range(X.shape[1]):
+            thr_list_plus[j, THR], thr_list_plus[j, MSE] = self._find_threshold(X[:, j], y, 1)
+            thr_list_minus[j, THR], thr_list_minus[j, MSE] = self._find_threshold(X[:, j], y, -1)
+
+        if np.min(thr_list_plus[:, MSE]) <= np.min(thr_list_minus[:, MSE]):
+            self.j_, self.threshold_ = np.argmin(thr_list_plus[:, MSE]), thr_list_plus[self.j_, THR]
+            self.sign_ = 1
+        else:
+            self.j_, self.threshold_ = np.argmin(thr_list_minus[:, MSE]), thr_list_minus[self.j_, THR]
+            self.sign_ = -1
 
     def _predict(self, X: np.ndarray) -> np.ndarray:
         """
@@ -49,9 +63,6 @@ class DecisionStump(BaseEstimator):
         ----------
         X : ndarray of shape (n_samples, n_features)
             Input data to predict responses for
-
-        y : ndarray of shape (n_samples, )
-            Responses of input data to fit to
 
         Returns
         -------
@@ -63,7 +74,7 @@ class DecisionStump(BaseEstimator):
         Feature values strictly below threshold are predicted as `-sign` whereas values which equal
         to or above the threshold are predicted as `sign`
         """
-        raise NotImplementedError()
+        return np.where(X[:, self.j_] < self.threshold_, -self.sign_, self.sign_)
 
     def _find_threshold(self, values: np.ndarray, labels: np.ndarray, sign: int) -> Tuple[float, float]:
         """
@@ -95,7 +106,8 @@ class DecisionStump(BaseEstimator):
         For every tested threshold, values strictly below threshold are predicted as `-sign` whereas values
         which equal to or above the threshold are predicted as `sign`
         """
-        raise NotImplementedError()
+
+        
 
     def _loss(self, X: np.ndarray, y: np.ndarray) -> float:
         """
