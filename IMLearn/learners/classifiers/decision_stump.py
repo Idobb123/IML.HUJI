@@ -116,7 +116,7 @@ class DecisionStump(BaseEstimator):
         losses = left_losses + right_losses
 
         min_loss_ind = np.argmin(losses)
-        if min_loss_ind == len(values):
+        if min_loss_ind == len(values):  # meaning the best thr is above the values in the sample
             threshold = values[min_loss_ind - 1] + 0.1
         else:
             threshold = values[min_loss_ind]
