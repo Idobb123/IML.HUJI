@@ -49,11 +49,11 @@ class DecisionStump(BaseEstimator):
             thr_list_minus[j, THR], thr_list_minus[j, MSE] = self._find_threshold(X[:, j], y, -1)
 
         if np.min(thr_list_plus[:, MSE]) <= np.min(thr_list_minus[:, MSE]):
-            self.j_, self.threshold_ = np.argmin(thr_list_plus[:, MSE]), thr_list_plus[self.j_, THR]
-            self.sign_ = 1
+            self.j_: int = int(np.argmin(thr_list_plus[:, MSE]))
+            self.threshold_, self.sign_ = thr_list_plus[self.j_, THR], 1
         else:
-            self.j_, self.threshold_ = np.argmin(thr_list_minus[:, MSE]), thr_list_minus[self.j_, THR]
-            self.sign_ = -1
+            self.j_ = int(np.argmin(thr_list_minus[:, MSE]))
+            self.threshold_, self.sign_ = thr_list_minus[self.j_, THR], -1
 
     def _predict(self, X: np.ndarray) -> np.ndarray:
         """
@@ -106,21 +106,21 @@ class DecisionStump(BaseEstimator):
         For every tested threshold, values strictly below threshold are predicted as `-sign` whereas values
         which equal to or above the threshold are predicted as `sign`
         """
-        loss_list = []
-        # calc the loss for each of the possible thr values
-        for i, val in enumerate(values):
-            cur_asgn = np.where(values < val, -sign, sign)
-            loss_list.append(float(np.sum(cur_asgn != labels) / len(labels)))
+        #sort the values so we can use cumsum to calculate the loss
+        sorted_indexes = np.argsort(values)
+        values, labels = values[sorted_indexes], labels[sorted_indexes]
 
-        # calc the loss for thr values above the sample values
-        above_loss = float(np.sum(np.ones(len(values)) != labels) / len(labels))
+        weights = np.where(np.sign(labels) == sign, np.abs(labels), 0)
+        left_losses = np.concatenate([[0], np.cumsum(weights)])
+        right_losses = np.concatenate([np.cumsum((np.abs(labels) - weights)[::-1])[::-1], [0]])
+        losses = left_losses + right_losses
 
-        thr_val, err_val = values[np.argmin(loss_list)], np.min(loss_list)
-        if err_val > above_loss:
-            thr_val = np.min(values) + 1
-            err_val = above_loss
-
-        return thr_val, err_val
+        min_loss_ind = np.argmin(losses)
+        if min_loss_ind == len(values):
+            threshold = values[min_loss_ind - 1] + 0.1
+        else:
+            threshold = values[min_loss_ind]
+        return threshold, losses[min_loss_ind] / len(values)
 
     def _loss(self, X: np.ndarray, y: np.ndarray) -> float:
         """
@@ -141,3 +141,6 @@ class DecisionStump(BaseEstimator):
         """
         from ...metrics import misclassification_error
         return misclassification_error(y, self._predict(X))
+
+
+
