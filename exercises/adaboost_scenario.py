@@ -52,10 +52,11 @@ def fit_and_evaluate_adaboost(noise, n_learners=250, train_size=5000, test_size=
         test_pred_list.append(AD_model.partial_loss(test_X, test_y, i))
     Q1_fig = go.Figure([go.Scatter(x=iter_list, y=train_pred_list, name="train error"),
                        go.Scatter(x=iter_list, y=test_pred_list, name="test error")])
-    Q1_fig.update_layout(title=f"Train and Test error of Adaboost learner as a function of number of learners<br>       "
-                               f"noise value of {noise}",
+    Q1_fig.update_layout(title=f"Train and Test error of Adaboost learner as a function of number of learners<br>"
+                               f"Noise Value Of: {noise}",
                          xaxis_title="number of learners",
-                         yaxis_title="error")
+                         yaxis_title="error",
+                         margin=dict(t=100))
     Q1_fig.write_image(f"Q1_fig_with_noise_{noise}.png")
 
     # Question 2: Plotting decision surfaces
@@ -71,13 +72,13 @@ def fit_and_evaluate_adaboost(noise, n_learners=250, train_size=5000, test_size=
                                      marker=dict(color=test_y, symbol=symbols, colorscale=[custom[0], custom[-1]],
                                                  line=dict(color="black", width=1)))],
                          rows=(i//2) + 1, cols=(i % 2) + 1)
-    Q2_fig.update_layout(title=f"Decision Boundary Of AdaBoost Ensemble As a Function Of Number Of Iterations<br> "
-                               f"noise value of {noise}",
+    Q2_fig.update_layout(title=f"Decision Boundary Of AdaBoost Ensemble As a Function Of Number Of Iterations<br>"
+                               f"Noise Value Of: {noise}",
                          margin=dict(t=100), title_font=dict(size=16))
     Q2_fig.write_image(f"Q2_fig_with_noise_{noise}.png")
 
     # Question 3: Decision surface of best performing ensemble
-    test_scores = np.array([AD_model.partial_loss(test_X, test_y, i) for i in range(1, 501)])
+    test_scores = np.array([AD_model.partial_loss(test_X, test_y, i) for i in range(1, n_learners + 1)])
     ind = np.argmin(test_scores)
     Q3_fig = go.Figure([decision_surface(lambda X: AD_model.partial_predict(X, ind+1), lims[0], lims[1], showscale=False),
                           go.Scatter(x=test_X[:, 0], y=test_X[:, 1], mode="markers",
@@ -89,9 +90,17 @@ def fit_and_evaluate_adaboost(noise, n_learners=250, train_size=5000, test_size=
     Q3_fig.write_image(f"Q3_fig_with_noise_{noise}.png")
 
     # Question 4: Decision surface with weighted samples
-
-
+    weighted_D = (AD_model.D_ / np.max(AD_model.D_)) * 20
+    train_symbols = np.where(train_y >= 0, "diamond", "cross")
+    Q4_fig = go.Figure([decision_surface(AD_model.predict, lims[0], lims[1], showscale=False),
+                          go.Scatter(x=train_X[:, 0], y=train_X[:, 1], mode="markers",
+                                     marker=dict(color=train_y, symbol=train_symbols, colorscale=[custom[0],custom[-1]],
+                                                 line=dict(color="black", width=1), size=weighted_D))])
+    Q4_fig.update_layout(title=f"Full Ensemble Decision Surface With Train Set Weighted By Final Distribution<br>"
+                               f"Noise Value of: {noise}")
+    Q4_fig.write_image(f"Q4_fig_with_noise_{noise}.png")
 
 if __name__ == '__main__':
     np.random.seed(0)
     fit_and_evaluate_adaboost(0)
+    fit_and_evaluate_adaboost(0.4)
