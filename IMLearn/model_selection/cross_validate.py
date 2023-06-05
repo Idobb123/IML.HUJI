@@ -45,6 +45,7 @@ def cross_validate(estimator: BaseEstimator, X: np.ndarray, y: np.ndarray,
     train_score, val_score = 0, 0
     for i in range(cv):
         train_indices = np.delete(ind_list, split_ind_list[i])
+        # TODO -> maybe need to copy the estimator
         cur_est = estimator.fit(X[train_indices], y[train_indices])
         train_score += scoring(y[train_indices], cur_est.predict(X[train_indices]))
         val_score += scoring(y[split_ind_list[i]], cur_est.predict(X[split_ind_list[i]]))
