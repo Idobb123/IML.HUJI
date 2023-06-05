@@ -5,6 +5,7 @@ from IMLearn.learners.classifiers import DecisionStump
 from utils import *
 import plotly.graph_objects as go
 from plotly.subplots import make_subplots
+from IMLearn.metrics.loss_functions import accuracy
 
 
 def generate_data(n: int, noise_ratio: float) -> Tuple[np.ndarray, np.ndarray]:
@@ -70,15 +71,25 @@ def fit_and_evaluate_adaboost(noise, n_learners=250, train_size=5000, test_size=
                                      marker=dict(color=test_y, symbol=symbols, colorscale=[custom[0], custom[-1]],
                                                  line=dict(color="black", width=1)))],
                          rows=(i//2) + 1, cols=(i % 2) + 1)
-    Q2_fig.update_layout(title="Decision Boundary Of AdaBoost Ensemble As a Function Of Number Of Iterations",
+    Q2_fig.update_layout(title=f"Decision Boundary Of AdaBoost Ensemble As a Function Of Number Of Iterations<br> "
+                               f"noise value of {noise}",
                          margin=dict(t=100), title_font=dict(size=16))
-    Q2_fig.write_image("Q2_fig.png")
+    Q2_fig.write_image(f"Q2_fig_with_noise_{noise}.png")
 
     # Question 3: Decision surface of best performing ensemble
-    raise NotImplementedError()
+    test_scores = np.array([AD_model.partial_loss(test_X, test_y, i) for i in range(1, 501)])
+    ind = np.argmin(test_scores)
+    Q3_fig = go.Figure([decision_surface(lambda X: AD_model.partial_predict(X, ind+1), lims[0], lims[1], showscale=False),
+                          go.Scatter(x=test_X[:, 0], y=test_X[:, 1], mode="markers",
+                                     marker=dict(color=test_y, symbol=symbols, colorscale=[custom[0], custom[-1]],
+                                                 line=dict(color="black", width=1)))])
+    Q3_fig.update_layout(title=f"Decision surface of best ensemble:<br>Size of {ind + 1}<br>"
+                               f"accuracy of {accuracy(test_y, AD_model.partial_predict(test_X, ind+1))}",
+                         margin=dict(t=100))
+    Q3_fig.write_image(f"Q3_fig_with_noise_{noise}.png")
 
     # Question 4: Decision surface with weighted samples
-    raise NotImplementedError()
+
 
 
 if __name__ == '__main__':
