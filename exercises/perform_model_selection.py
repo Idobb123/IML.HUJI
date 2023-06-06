@@ -88,9 +88,10 @@ def select_regularization_parameter(n_samples: int = 50, n_evaluations: int = 50
     lasso_y_hat = Lasso(alpha=best_l_value).fit(train_X, train_y).predict(test_X)
     opt_lasso_MSE = mean_square_error(test_y, lasso_y_hat)
     LS_MSE = LinearRegression().fit(train_X, train_y).loss(test_X, test_y)
+
+    #printing the results
     print("Best Ridge value: ", np.round(best_r_value, 5))
     print("Best Lasso value: ", np.round(best_l_value, 5))
-
     print("Optimal Ridge MSE: ", np.round(opt_ridge_MSE))
     print("Optimal Lasso MSE: ", np.round(opt_lasso_MSE))
     print("LS MSE: ", np.round(LS_MSE))
