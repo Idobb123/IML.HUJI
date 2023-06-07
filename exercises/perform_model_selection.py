@@ -1,13 +1,13 @@
 from __future__ import annotations
 import numpy as np
 import pandas as pd
+import sklearn.linear_model
 from sklearn import datasets
 from IMLearn.metrics import mean_square_error
 from IMLearn.utils import split_train_test
 from IMLearn.model_selection import cross_validate
 from IMLearn.learners.regressors import PolynomialFitting, LinearRegression, RidgeRegression
 from sklearn.linear_model import Lasso
-
 from utils import *
 import plotly.graph_objects as go
 from plotly.subplots import make_subplots
@@ -59,7 +59,7 @@ def select_regularization_parameter(n_samples: int = 50, n_evaluations: int = 50
     train_X, train_y, test_X, test_y = train_X.to_numpy(), train_y.to_numpy(), test_X.to_numpy(), test_y.to_numpy()
 
     # Question 7 - Perform CV for different values of the regularization parameter for Ridge and Lasso regressions
-    r_values, l_values, = np.linspace(0.01, 0.2, n_evaluations), np.linspace(0.01, 1, n_evaluations)
+    r_values, l_values, = np.linspace(0.01, 0.25, n_evaluations), np.linspace(0.01, 1, n_evaluations)
     r_score, l_score = np.empty((n_evaluations, 2)), np.empty((n_evaluations, 2))
     # now calculate the score for different values of lambda
     for i in range(n_evaluations):
@@ -83,13 +83,13 @@ def select_regularization_parameter(n_samples: int = 50, n_evaluations: int = 50
     best_r_value = r_values[np.argmin(r_score[:, 1])]
     best_l_value = l_values[np.argmin(l_score[:, 1])]
 
-    #calculating the MSE for the optimal values
+    # calculating the MSE for the optimal values
     opt_ridge_MSE = RidgeRegression(lam=best_r_value).fit(train_X, train_y).loss(test_X, test_y)
     lasso_y_hat = Lasso(alpha=best_l_value).fit(train_X, train_y).predict(test_X)
     opt_lasso_MSE = mean_square_error(test_y, lasso_y_hat)
     LS_MSE = LinearRegression().fit(train_X, train_y).loss(test_X, test_y)
 
-    #printing the results
+    # printing the results
     print("Best Ridge value: ", np.round(best_r_value, 5))
     print("Best Lasso value: ", np.round(best_l_value, 5))
     print("Optimal Ridge MSE: ", np.round(opt_ridge_MSE))
@@ -97,8 +97,6 @@ def select_regularization_parameter(n_samples: int = 50, n_evaluations: int = 50
     print("LS MSE: ", np.round(LS_MSE))
 
 
-
 if __name__ == '__main__':
     np.random.seed(0)
-    #raise NotImplementedError()
     select_regularization_parameter()
