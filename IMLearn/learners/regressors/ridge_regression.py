@@ -59,9 +59,11 @@ class RidgeRegression(BaseEstimator):
         -----
         Fits model with or without an intercept depending on value of `self.include_intercept_`
         """
-        I = np.eye(X.shape[1] + int(self.include_intercept_))
+        I = np.eye(X.shape[1])
         if self.include_intercept_:
             X = np.concatenate((np.ones((X.shape[0], 1)), X), axis=1)
+            # zeroing out the first entrance so we dont add lambda to the intercept
+            I = np.eye(X.shape[1] + 1)
             I[0, 0] = 0
         self.coefs_ = (np.linalg.inv((X.T @ X) + self.lam_ * I) @ X.T) @ y
 
