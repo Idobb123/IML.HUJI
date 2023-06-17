@@ -73,12 +73,38 @@ def get_gd_state_recorder_callback() -> Tuple[Callable[[], None], List[np.ndarra
     weights: List[np.ndarray]
         Recorded parameters
     """
-    raise NotImplementedError()
+    values = []
+    weights = []
+
+    def f(**kwargs):
+        values.append(kwargs["val"])
+        weights.append(kwargs["weights"])
+
+    return f, values, weights
 
 
 def compare_fixed_learning_rates(init: np.ndarray = np.array([np.sqrt(2), np.e / 3]),
                                  etas: Tuple[float] = (1, .1, .01, .001)):
-    raise NotImplementedError()
+    # Q1 : plotting descent path of L1 and L2 for different values of eta
+    for module, m_name in [(L2, "L2"), (L1, "L1")]:
+        conv_rate_fig = go.Figure()
+        best_loss = np.inf
+        best_eta = 0
+        for eta in etas:
+            callback, values, weights = get_gd_state_recorder_callback()
+            model = GradientDescent(learning_rate=FixedLR(eta), callback=callback)
+            model.fit(module(init), np.ndarray((0,)), np.ndarray((0,)))
+            title = f"for {m_name} with \u03B7={eta}"
+            module_dp_fig = plot_descent_path(module=module, descent_path=np.array(weights), title=title)
+            module_dp_fig.write_image(rf"../figures/{m_name}_Descent_Path_for_eta={eta}.png")
+            conv_rate_fig.add_trace(go.Scatter(x=np.array(range(1, 1001)), y=values, name=f"\u03B7={eta}"))
+            if np.min(values) < best_loss:
+                best_loss = np.min(values)
+                best_eta = eta
+        print(f"Best {m_name} loss is achieved with eta={best_eta} and its value is: {best_loss}")
+        conv_rate_fig.update_layout(title=f"Convergence rate of {m_name} module for a selection of \u03B7 values",
+                                    xaxis_title="Iterations", yaxis_title=f"{m_name} Norm value")
+        conv_rate_fig.write_image(f"../figures/{m_name}_conv_fig.png")
 
 
 def compare_exponential_decay_rates(init: np.ndarray = np.array([np.sqrt(2), np.e / 3]),
@@ -141,5 +167,5 @@ def fit_logistic_regression():
 if __name__ == '__main__':
     np.random.seed(0)
     compare_fixed_learning_rates()
-    compare_exponential_decay_rates()
-    fit_logistic_regression()
+    #compare_exponential_decay_rates()
+    #fit_logistic_regression()

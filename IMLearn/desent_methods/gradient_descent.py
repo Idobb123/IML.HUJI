@@ -126,7 +126,7 @@ class GradientDescent:
             i += 1
             val, grad, eta = f.compute_output(X=X, y=y), f.compute_jacobian(X=X, y=y), self.learning_rate_.lr_step(t=t)
             next_w = r - eta * grad
-            delta = np.sqrt((f.weights - next_w)**2)
+            delta = np.linalg.norm(f.weights - next_w)
             f.weights = next_w
             if self.out_type_ == "best":
                 cur_val = f.compute_output(X=X, y=y)
