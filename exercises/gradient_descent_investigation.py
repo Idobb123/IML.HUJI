@@ -98,8 +98,8 @@ def compare_fixed_learning_rates(init: np.ndarray = np.array([np.sqrt(2), np.e /
             module_dp_fig = plot_descent_path(module=module, descent_path=np.array(weights), title=title)
             module_dp_fig.write_image(rf"../figures/{m_name}_Descent_Path_for_eta={eta}.png")
             conv_rate_fig.add_trace(go.Scatter(x=np.array(range(1, 1001)), y=values, name=f"\u03B7={eta}"))
-            if np.min(values) < best_loss:
-                best_loss = np.min(values)
+            if values[-1] < best_loss:
+                best_loss = values[-1]
                 best_eta = eta
         print(f"Best {m_name} loss is achieved with eta={best_eta} and its value is: {best_loss}")
         conv_rate_fig.update_layout(title=f"Convergence rate of {m_name} module for a selection of \u03B7 values",
@@ -168,4 +168,4 @@ if __name__ == '__main__':
     np.random.seed(0)
     compare_fixed_learning_rates()
     #compare_exponential_decay_rates()
-    #fit_logistic_regression()
+    fit_logistic_regression()
