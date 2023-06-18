@@ -131,7 +131,10 @@ class LogisticModule(BaseModule):
         output: ndarray of shape (1,)
             Value of function at point self.weights
         """
-        raise NotImplementedError()
+        # implementation according to equation 3.26 in the linear regression section of the book
+        X_w = X @ self.weights
+        log = np.log(1 + np.exp(X_w))
+        return - np.sum(y*X_w - log) / X.shape[0]
 
     def compute_jacobian(self, X: np.ndarray, y: np.ndarray, **kwargs) -> np.ndarray:
         """
@@ -150,7 +153,7 @@ class LogisticModule(BaseModule):
         output: ndarray of shape (n_features,)
             Derivative of function with respect to self.weights at point self.weights
         """
-        raise NotImplementedError()
+        return -np.sum((y.T * X.T).T - (X.T * (1 - 1 / (1 + np.exp(X @ self.weights))).T).T, axis=0) / X.shape[0]
 
 
 class RegularizedModule(BaseModule):
