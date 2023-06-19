@@ -96,8 +96,8 @@ def compare_fixed_learning_rates(init: np.ndarray = np.array([np.sqrt(2), np.e /
             model.fit(module(init), np.ndarray((0,)), np.ndarray((0,)))
             title = f"for {m_name} with \u03B7={eta}"
             module_dp_fig = plot_descent_path(module=module, descent_path=np.array(weights), title=title)
-            #module_dp_fig.write_image(rf"../figures/{m_name}_Descent_Path_for_eta={eta}.png")
-            module_dp_fig.write_image(rf"../test_directory/{m_name}_Descent_Path_for_eta={eta}.png")
+            module_dp_fig.write_image(rf"../figures/{m_name}_Descent_Path_for_eta={eta}.png")
+            # module_dp_fig.write_image(rf"../test_directory/{m_name}_Descent_Path_for_eta={eta}.png")
             conv_rate_fig.add_trace(go.Scatter(x=np.array(range(1, 1001)), y=values, name=f"\u03B7={eta}"))
             if values[-1] < best_loss:
                 best_loss = values[-1]
@@ -105,8 +105,8 @@ def compare_fixed_learning_rates(init: np.ndarray = np.array([np.sqrt(2), np.e /
         print(f"Best {m_name} loss is achieved with eta={best_eta} and its value is: {best_loss}")
         conv_rate_fig.update_layout(title=f"Convergence rate of {m_name} module for a selection of \u03B7 values",
                                     xaxis_title="Iterations", yaxis_title=f"{m_name} Norm value")
-        #conv_rate_fig.write_image(f"../figures/{m_name}_conv_fig.png")
-        conv_rate_fig.write_image(f"../test_directory/{m_name}_conv_fig.png")
+        conv_rate_fig.write_image(f"../figures/{m_name}_conv_fig.png")
+        # conv_rate_fig.write_image(f"../test_directory/{m_name}_conv_fig.png")
 
 
 def compare_exponential_decay_rates(init: np.ndarray = np.array([np.sqrt(2), np.e / 3]),
