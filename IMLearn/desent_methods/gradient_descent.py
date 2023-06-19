@@ -144,4 +144,3 @@ class GradientDescent:
         if self.out_type_ == "average":
             return r / i
         return r
-
