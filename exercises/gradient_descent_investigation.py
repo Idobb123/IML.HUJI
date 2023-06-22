@@ -7,6 +7,7 @@ from IMLearn.desent_methods import GradientDescent, FixedLR, ExponentialLR
 from IMLearn.desent_methods.modules import L1, L2
 from IMLearn.learners.classifiers.logistic_regression import LogisticRegression
 from IMLearn.utils import split_train_test
+from sklearn.metrics import roc_curve
 
 import plotly.graph_objects as go
 
@@ -96,8 +97,8 @@ def compare_fixed_learning_rates(init: np.ndarray = np.array([np.sqrt(2), np.e /
             model.fit(module(init), np.ndarray((0,)), np.ndarray((0,)))
             title = f"for {m_name} with \u03B7={eta}"
             module_dp_fig = plot_descent_path(module=module, descent_path=np.array(weights), title=title)
-            module_dp_fig.write_image(rf"../figures/{m_name}_Descent_Path_for_eta={eta}.png")
-            # module_dp_fig.write_image(rf"../test_directory/{m_name}_Descent_Path_for_eta={eta}.png")
+            # module_dp_fig.write_image(rf"../figures/{m_name}_Descent_Path_for_eta={eta}.png")
+            module_dp_fig.write_image(rf"../test_directory/{m_name}_Descent_Path_for_eta={eta}.png")
             conv_rate_fig.add_trace(go.Scatter(x=np.array(range(1, 1001)), y=values, name=f"\u03B7={eta}"))
             if values[-1] < best_loss:
                 best_loss = values[-1]
@@ -105,8 +106,8 @@ def compare_fixed_learning_rates(init: np.ndarray = np.array([np.sqrt(2), np.e /
         print(f"Best {m_name} loss is achieved with eta={best_eta} and its value is: {best_loss}")
         conv_rate_fig.update_layout(title=f"Convergence rate of {m_name} module for a selection of \u03B7 values",
                                     xaxis_title="Iterations", yaxis_title=f"{m_name} Norm value")
-        conv_rate_fig.write_image(f"../figures/{m_name}_conv_fig.png")
-        # conv_rate_fig.write_image(f"../test_directory/{m_name}_conv_fig.png")
+        # conv_rate_fig.write_image(f"../figures/{m_name}_conv_fig.png")
+        conv_rate_fig.write_image(f"../test_directory/{m_name}_conv_fig.png")
 
 
 def compare_exponential_decay_rates(init: np.ndarray = np.array([np.sqrt(2), np.e / 3]),
@@ -159,7 +160,7 @@ def fit_logistic_regression():
     X_train, y_train, X_test, y_test = load_data()
 
     # Plotting convergence rate of logistic regression over SA heart disease data
-    raise NotImplementedError()
+
 
     # Fitting l1- and l2-regularized logistic regression models, using cross-validation to specify values
     # of regularization parameter
@@ -168,6 +169,6 @@ def fit_logistic_regression():
 
 if __name__ == '__main__':
     np.random.seed(0)
-    compare_fixed_learning_rates()
+    #compare_fixed_learning_rates()
     #compare_exponential_decay_rates()
     fit_logistic_regression()
