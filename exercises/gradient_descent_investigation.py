@@ -11,9 +11,11 @@ from sklearn.metrics import roc_curve
 from IMLearn.model_selection import cross_validate
 from IMLearn.metrics import misclassification_error
 from plotly.subplots import make_subplots
+import copy
 
 import plotly.graph_objects as go
 
+FILE_PREFIX = "../figures/"
 
 def plot_descent_path(module: Type[BaseModule],
                       descent_path: np.ndarray,
@@ -90,7 +92,7 @@ def get_gd_state_recorder_callback() -> Tuple[Callable[[], None], List[np.ndarra
 def compare_fixed_learning_rates(init: np.ndarray = np.array([np.sqrt(2), np.e / 3]),
                                  etas: Tuple[float] = (1, .1, .01, .001)):
     # Q1 : plotting descent path of L1 and L2 for different values of eta
-    for module, m_name in [(L2, "L2"), (L1, "L1")]:
+    for module, m_name in [(L1, "L1"), (L2, "L2")]:
         sub_plot_titles = ["\u03B7=1", "\u03B7=0.1", "\u03B7=0.01", "\u03B7=0.001"]
         conv_rate_fig = make_subplots(2, 2, subplot_titles=sub_plot_titles)
         best_loss = np.inf
@@ -101,8 +103,7 @@ def compare_fixed_learning_rates(init: np.ndarray = np.array([np.sqrt(2), np.e /
             model.fit(module(init), np.ndarray((0,)), np.ndarray((0,)))
             title = f"for {m_name} with \u03B7={eta}"
             module_dp_fig = plot_descent_path(module=module, descent_path=np.array(weights), title=title)
-            module_dp_fig.write_image(rf"../figures/{m_name}_Descent_Path_for_eta={eta}.png")
-            # module_dp_fig.write_image(rf"../test_directory/{m_name}_Descent_Path_for_eta={eta}.png")
+            module_dp_fig.write_image(FILE_PREFIX + f"{m_name}_Descent_Path_for_eta={eta}.png")
             conv_rate_fig.add_trace(go.Scatter(x=np.array(range(1, 1001)), y=values, showlegend=False),
                                     row=i//2 + 1, col=(i % 2) + 1)
             if values[-1] < best_loss:
@@ -111,8 +112,7 @@ def compare_fixed_learning_rates(init: np.ndarray = np.array([np.sqrt(2), np.e /
         print(f"Best {m_name} loss is achieved with eta={best_eta} and its value is: {np.round(best_loss,5)}")
         conv_rate_fig.update_layout(title=f"Convergence rate of {m_name} module for a selection of \u03B7 values",
                                     xaxis_title="Iterations", yaxis_title=f"{m_name} Norm value", margin=dict(t=100))
-        conv_rate_fig.write_image(f"../figures/{m_name}_conv_fig.png")
-        # conv_rate_fig.write_image(f"../test_directory/{m_name}_conv_fig.png")
+        conv_rate_fig.write_image(FILE_PREFIX + f"{m_name}_conv_fig.png")
 
 
 def compare_exponential_decay_rates(init: np.ndarray = np.array([np.sqrt(2), np.e / 3]),
@@ -190,7 +190,7 @@ def fit_logistic_regression():
                          xaxis=dict(title=r"$\text{False Positive Rate (FPR)}$"),
                          yaxis=dict(title=r"$\text{True Positive Rate (TPR)}$"),
                          margin=dict(t=100)))
-    q8_fig.write_image(f"../figures/q8_ROC_curve.png")
+    q8_fig.write_image(FILE_PREFIX + "q8_ROC_curve.png")
 
     # Fitting l1- and l2-regularized logistic regression models, using cross-validation to specify values
     # of regularization parameter
@@ -219,4 +219,4 @@ if __name__ == '__main__':
     np.random.seed(0)
     compare_fixed_learning_rates()
     #compare_exponential_decay_rates()
-    #fit_logistic_regression()
+    fit_logistic_regression()
