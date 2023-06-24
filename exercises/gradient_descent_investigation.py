@@ -11,11 +11,11 @@ from sklearn.metrics import roc_curve
 from IMLearn.model_selection import cross_validate
 from IMLearn.metrics import misclassification_error
 from plotly.subplots import make_subplots
-import copy
 
 import plotly.graph_objects as go
 
-FILE_PREFIX = "../figures/"
+FILE_PREFIX = ""
+
 
 def plot_descent_path(module: Type[BaseModule],
                       descent_path: np.ndarray,
@@ -92,7 +92,7 @@ def get_gd_state_recorder_callback() -> Tuple[Callable[[], None], List[np.ndarra
 def compare_fixed_learning_rates(init: np.ndarray = np.array([np.sqrt(2), np.e / 3]),
                                  etas: Tuple[float] = (1, .1, .01, .001)):
     # Q1 : plotting descent path of L1 and L2 for different values of eta
-    for module, m_name in [(L1, "L1"), (L2, "L2")]:
+    for module, m_name in [(L2, "L2"), (L1, "L1")]:
         sub_plot_titles = ["\u03B7=1", "\u03B7=0.1", "\u03B7=0.01", "\u03B7=0.001"]
         conv_rate_fig = make_subplots(2, 2, subplot_titles=sub_plot_titles)
         best_loss = np.inf
@@ -183,7 +183,7 @@ def fit_logistic_regression():
               go.Scatter(x=fpr, y=tpr, mode='markers+lines', text=thresholds, name="", showlegend=False,
                          hovertemplate="<b>Threshold:</b>%{text:.3f}<br>FPR: %{x:.3f}<br>TPR: %{y:.3f}"),
                              go.Scatter(x=[fpr[best_alpha_arg]], y=[tpr[best_alpha_arg]], text=best_alpha,
-                                        mode="markers", marker=dict(size=14, color="orange", symbol="x"),
+                                        mode="markers", marker=dict(size=14, color="blue", symbol="x"),
                                         name="Optimal \u03B1 value")],
         layout=go.Layout(title=f"ROC of Unregularized Logistic Regression Model over test set<br>Optimal \u03B1 value "
                                f"of {np.round(best_alpha,3)} with test error of {test_loss}",
