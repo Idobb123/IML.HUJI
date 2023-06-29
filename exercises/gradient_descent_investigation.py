@@ -119,13 +119,29 @@ def compare_exponential_decay_rates(init: np.ndarray = np.array([np.sqrt(2), np.
                                     eta: float = .1,
                                     gammas: Tuple[float] = (.9, .95, .99, 1)):
     # Optimize the L1 objective using different decay-rate values of the exponentially decaying learning rate
-    raise NotImplementedError()
-
+    # +
     # Plot algorithm's convergence for the different values of gamma
-    raise NotImplementedError()
+    sub_plot_titles = [f"\u03B3={gamma}" for gamma in gammas]
+    Q5_fig = make_subplots(2, 2, subplot_titles=sub_plot_titles)
+    print("\n")
+    for i, gamma in enumerate(gammas):
+        callback, values, weights = get_gd_state_recorder_callback()
+        model = GradientDescent(learning_rate=ExponentialLR(eta, gamma), callback=callback)
+        model.fit(L1(init), np.ndarray((0,)), np.ndarray((0,)))
+        Q5_fig.add_trace(go.Scatter(x=np.array(range(1, 1001)), y=values, showlegend=False),
+                                    row=i//2 + 1, col=(i % 2) + 1)
+        print(f"best L1 norm using \u03B7={eta} and \u03B3={gamma} is: {values[-1]}")
+
+    Q5_fig.update_layout(title="Convergence rate of L1 with \u03B7=0.1 using various decay rates",
+                         xaxis_title="Iterations", yaxis_title="L1 norm values",  margin=dict(t=100))
+    Q5_fig.write_image(FILE_PREFIX + "Q5_fig.png")
 
     # Plot descent path for gamma=0.95
-    raise NotImplementedError()
+    callback, values, weights = get_gd_state_recorder_callback()
+    GradientDescent(learning_rate=ExponentialLR(eta, gammas[1]), callback=callback).fit(L1(init), [], [])
+    Q7_fig = plot_descent_path(module=L1, descent_path=np.array(weights),
+                      title=f"Descent path of L1 using \u03B7={eta} and \u03B3={gammas[1]}")
+    Q7_fig.write_image(FILE_PREFIX + "Q7_fig.png")
 
 
 def load_data(path: str = "../datasets/SAheart.data", train_portion: float = .8) -> \
@@ -218,5 +234,5 @@ def fit_logistic_regression():
 if __name__ == '__main__':
     np.random.seed(0)
     compare_fixed_learning_rates()
-    #compare_exponential_decay_rates()
-    fit_logistic_regression()
+    compare_exponential_decay_rates()
+    #fit_logistic_regression()
