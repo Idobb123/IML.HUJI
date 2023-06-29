@@ -184,7 +184,11 @@ def fit_logistic_regression():
     # Plotting convergence rate of logistic regression over SA heart disease data
     model = LogisticRegression(solver=GradientDescent(max_iter=20000, learning_rate=FixedLR(1e-4))).fit(X_train,
                                                                                                         y_train)
-    fpr, tpr, thresholds = roc_curve(y_test, model.predict_proba(X_test))
+
+    # there is some conflicting information in the forums regarding whether the ROC should be plotted on the test
+    # or the train set. Reshef states that it should be on the test and gilad (according to one of the students...) on
+    # the train set. in the ex Answers file I've included both but here is the one on the train set
+    fpr, tpr, thresholds = roc_curve(y_train, model.predict_proba(X_train))
     # now selecting the best alpha
     best_alpha_arg = np.argmax(tpr - fpr)
     best_alpha = thresholds[best_alpha_arg]
@@ -201,7 +205,7 @@ def fit_logistic_regression():
                              go.Scatter(x=[fpr[best_alpha_arg]], y=[tpr[best_alpha_arg]], text=best_alpha,
                                         mode="markers", marker=dict(size=14, color="blue", symbol="x"),
                                         name="Optimal \u03B1 value")],
-        layout=go.Layout(title=f"ROC of Unregularized Logistic Regression Model over test set<br>Optimal \u03B1 value "
+        layout=go.Layout(title=f"ROC of Unregularized Logistic Regression Model over train set<br>Optimal \u03B1 value "
                                f"of {np.round(best_alpha,3)} with test error of {test_loss}",
                          xaxis=dict(title=r"$\text{False Positive Rate (FPR)}$"),
                          yaxis=dict(title=r"$\text{True Positive Rate (TPR)}$"),
@@ -235,4 +239,4 @@ if __name__ == '__main__':
     np.random.seed(0)
     compare_fixed_learning_rates()
     compare_exponential_decay_rates()
-    #fit_logistic_regression()
+    fit_logistic_regression()
